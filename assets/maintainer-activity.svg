@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="900" height="200" viewBox="0 0 900 200" role="img" aria-labelledby="title desc">
   <title id="title">OpenSiro maintainer activity</title>
-  <desc id="desc">272 GitHub contributions per day over the last 10 completed days, with a peak of 377. Today is live at 317 contributions. The completed 10-day window includes 692 merged pull requests, 353 opened issues, 914 commit contributions, and activity across 14 repositories.</desc>
+  <desc id="desc">272 GitHub contributions per day over the last 10 completed days, with a peak of 377. Today is live at 318 contributions. The completed 10-day window includes 692 merged pull requests, 353 opened issues, 914 commit contributions, and activity across 14 repositories.</desc>
 
   <g id="layer-chrome">
     <rect x="0.5" y="0.5" width="899" height="199" rx="14" fill="#ffffff" stroke="#d0d7de"/>
@@ -34,16 +34,16 @@
   </g>
 
   <g id="layer-live" fill="#18181b" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,Liberation Mono,monospace">
-    <line x1="801.0" y1="78.0" x2="850.0" y2="99.3" stroke="#18181b" stroke-width="2.2" stroke-linecap="round" stroke-dasharray="4 4"/>
-    <circle cx="850.0" cy="99.3" r="4.2" fill="#ffffff" stroke="#18181b" stroke-width="2"/>
-    <text x="850" y="58" text-anchor="end" font-size="10" font-weight="700">317 TODAY · LIVE</text>
+    <line x1="801.0" y1="78.0" x2="850.0" y2="98.9" stroke="#18181b" stroke-width="2.2" stroke-linecap="round" stroke-dasharray="4 4"/>
+    <circle cx="850.0" cy="98.9" r="4.2" fill="#ffffff" stroke="#18181b" stroke-width="2"/>
+    <text x="850" y="58" text-anchor="end" font-size="10" font-weight="700">318 TODAY · LIVE</text>
     <text x="850" y="186" text-anchor="end" font-size="10" fill="#6e7781">Sep 30 · live</text>
   </g>
 
   <g id="layer-mascot" aria-hidden="true">
     <g>
       <text x="0" y="-8" text-anchor="middle" dominant-baseline="middle" font-family="'Noto Sans JP','Hiragino Sans','Yu Gothic',sans-serif" font-size="18" font-weight="600" fill="#18181b">白</text>
-      <animateMotion dur="5s" repeatCount="indefinite" rotate="0" path="M 360.0,100.3 L 409.0,90.1 L 458.0,84.7 L 507.0,123.7 L 556.0,98.9 L 605.0,145.4 L 654.0,156.0 L 703.0,152.8 L 752.0,123.7 L 801.0,78.0 L 850.0,99.3"/>
+      <animateMotion dur="5s" repeatCount="indefinite" rotate="0" path="M 360.0,100.3 L 409.0,90.1 L 458.0,84.7 L 507.0,123.7 L 556.0,98.9 L 605.0,145.4 L 654.0,156.0 L 703.0,152.8 L 752.0,123.7 L 801.0,78.0 L 850.0,98.9"/>
     </g>
   </g>
 </svg>
