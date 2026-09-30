@@ -1,43 +1,37 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="900" height="190" viewBox="0 0 900 190" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="200" viewBox="0 0 900 200" role="img" aria-labelledby="title desc">
   <title id="title">OpenSiro maintainer activity</title>
   <desc id="desc">272 GitHub contributions per day over the last 10 completed days, with a peak of 377. The same window includes 692 merged pull requests, 353 opened issues, 914 commit contributions, and activity across 14 repositories.</desc>
-  <rect x="0.5" y="0.5" width="899" height="189" rx="14" fill="#ffffff" stroke="#d0d7de"/>
+  <rect x="0.5" y="0.5" width="899" height="199" rx="14" fill="#ffffff" stroke="#d0d7de"/>
   <g fill="#18181b" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,Liberation Mono,monospace">
     <text x="30" y="34" font-size="12" font-weight="700" letter-spacing="1.4">OPENSIRO / MAINTAINER ACTIVITY</text>
     <text x="870" y="34" text-anchor="end" font-size="10" fill="#6e7781" letter-spacing="0.8">PROFILE-WIDE GITHUB</text>
 
-    <text x="30" y="94" font-size="42" font-weight="700">272</text>
-    <text x="30" y="118" font-size="12" fill="#57606a">contributions/day · 10d avg</text>
-    <text x="210" y="94" font-size="30" font-weight="700">377</text>
-    <text x="210" y="118" font-size="12" fill="#57606a">peak / day</text>
-
-    <line x1="340" y1="121.6" x2="620" y2="121.6" stroke="#d8dee4" stroke-width="1" stroke-dasharray="4 5"/>
-    <polyline points="340.0,109.8 371.1,101.6 402.2,97.4 433.3,128.4 464.4,108.6 495.6,145.5 526.7,154.0 557.8,151.5 588.9,128.4 620.0,92.0" fill="none" stroke="#18181b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-    <circle cx="340.0" cy="109.8" r="2.8"/><circle cx="371.1" cy="101.6" r="2.8"/><circle cx="402.2" cy="97.4" r="2.8"/><circle cx="433.3" cy="128.4" r="2.8"/><circle cx="464.4" cy="108.6" r="2.8"/><circle cx="495.6" cy="145.5" r="2.8"/><circle cx="526.7" cy="154.0" r="2.8"/><circle cx="557.8" cy="151.5" r="2.8"/><circle cx="588.9" cy="128.4" r="2.8"/><circle cx="620.0" cy="92.0" r="2.8"/>
-    <text x="340" y="177" font-size="10" fill="#6e7781">Sep 20</text>
-    <text x="620" y="177" text-anchor="end" font-size="10" fill="#6e7781">Sep 29</text>
+    <text x="30" y="86" font-size="42" font-weight="700">272</text>
+    <text x="30" y="108" font-size="12" fill="#57606a">contributions/day · 10d avg</text>
+    <text x="210" y="86" font-size="30" font-weight="700">377</text>
+    <text x="210" y="108" font-size="12" fill="#57606a">peak / day</text>
 
     <g>
-      <text x="660" y="70" font-size="9" font-weight="700" fill="#6e7781" letter-spacing="1.1">10D ACTIVITY</text>
+      <text x="30" y="132" font-size="9" font-weight="700" fill="#6e7781" letter-spacing="1.1">10D ACTIVITY</text>
 
-      <text x="660" y="100" font-size="21" font-weight="700">692</text>
-      <text x="660" y="115" font-size="10" fill="#57606a">PRs · merged</text>
+      <text x="30" y="154" font-size="15"><tspan font-weight="700">692</tspan><tspan font-size="10" fill="#57606a"> PRs</tspan></text>
+      <text x="165" y="154" font-size="15"><tspan font-weight="700">353</tspan><tspan font-size="10" fill="#57606a"> issues</tspan></text>
 
-      <text x="770" y="100" font-size="21" font-weight="700">353</text>
-      <text x="770" y="115" font-size="10" fill="#57606a">issues</text>
-
-      <text x="660" y="146" font-size="21" font-weight="700">914</text>
-      <text x="660" y="161" font-size="10" fill="#57606a">commits</text>
-
-      <text x="770" y="146" font-size="21" font-weight="700">14</text>
-      <text x="770" y="161" font-size="10" fill="#57606a">repos</text>
+      <text x="30" y="179" font-size="15"><tspan font-weight="700">914</tspan><tspan font-size="10" fill="#57606a"> commits</tspan></text>
+      <text x="165" y="179" font-size="15"><tspan font-weight="700">14</tspan><tspan font-size="10" fill="#57606a"> repos</tspan></text>
     </g>
+
+    <line x1="360" y1="115.2" x2="850" y2="115.2" stroke="#d8dee4" stroke-width="1" stroke-dasharray="4 5"/>
+    <polyline points="360.0,100.3 414.4,90.1 468.9,84.7 523.3,123.7 577.8,98.9 632.2,145.4 686.7,156.0 741.1,152.8 795.6,123.7 850.0,78.0" fill="none" stroke="#18181b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="360.0" cy="100.3" r="2.8"/><circle cx="414.4" cy="90.1" r="2.8"/><circle cx="468.9" cy="84.7" r="2.8"/><circle cx="523.3" cy="123.7" r="2.8"/><circle cx="577.8" cy="98.9" r="2.8"/><circle cx="632.2" cy="145.4" r="2.8"/><circle cx="686.7" cy="156.0" r="2.8"/><circle cx="741.1" cy="152.8" r="2.8"/><circle cx="795.6" cy="123.7" r="2.8"/><circle cx="850.0" cy="78.0" r="2.8"/>
+    <text x="360" y="186" font-size="10" fill="#6e7781">Sep 20</text>
+    <text x="850" y="186" text-anchor="end" font-size="10" fill="#6e7781">Sep 29</text>
   </g>
 
   <g aria-hidden="true">
     <g>
       <text x="0" y="-8" text-anchor="middle" dominant-baseline="middle" font-family="'Noto Sans JP','Hiragino Sans','Yu Gothic',sans-serif" font-size="18" font-weight="600" fill="#18181b">白</text>
-      <animateMotion dur="5s" repeatCount="indefinite" rotate="0" path="M 340.0,109.8 L 371.1,101.6 L 402.2,97.4 L 433.3,128.4 L 464.4,108.6 L 495.6,145.5 L 526.7,154.0 L 557.8,151.5 L 588.9,128.4 L 620.0,92.0"/>
+      <animateMotion dur="5s" repeatCount="indefinite" rotate="0" path="M 360.0,100.3 L 414.4,90.1 L 468.9,84.7 L 523.3,123.7 L 577.8,98.9 L 632.2,145.4 L 686.7,156.0 L 741.1,152.8 L 795.6,123.7 L 850.0,78.0"/>
     </g>
   </g>
 </svg>
