@@ -1,3 +1,3 @@
-<!-- MAINTAINER_STATS_START -->
-**OpenSiro maintainer** · 10d avg **272 contributions/day** · peak **377/day**
-<!-- MAINTAINER_STATS_END -->
+<p align="center">
+  <img src="./assets/maintainer-activity.svg" alt="OpenSiro maintainer activity: rolling 10-day average and peak GitHub contributions" width="900">
+</p>

@@ -2,7 +2,6 @@
 
 import json
 import os
-import re
 import urllib.request
 from datetime import date, datetime, time, timedelta, timezone
 from pathlib import Path
@@ -10,10 +9,8 @@ from pathlib import Path
 USERNAME = "xLagerFeuer"
 WINDOW_DAYS = 10
 HISTORY_LOOKBACK_DAYS = 90
-README_PATH = Path("README.md")
 HISTORY_PATH = Path("stats/history.json")
-START_MARKER = "<!-- MAINTAINER_STATS_START -->"
-END_MARKER = "<!-- MAINTAINER_STATS_END -->"
+CARD_PATH = Path("assets/maintainer-activity.svg")
 
 
 def graphql(query: str, variables: dict) -> dict:
@@ -84,31 +81,70 @@ def load_history() -> dict:
     return json.loads(HISTORY_PATH.read_text())
 
 
-def save_history(history: dict) -> None:
+def save_history(history: dict, as_of: date, avg: int, peak: int) -> None:
     HISTORY_PATH.parent.mkdir(parents=True, exist_ok=True)
     history["username"] = USERNAME
     history["scope"] = "github"
     history.pop("organization", None)
     history["window_days"] = WINDOW_DAYS
+    history["summary"] = {
+        "as_of": as_of.isoformat(),
+        "avg_10d": avg,
+        "peak_10d": peak,
+    }
     history["updated_at"] = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     history["days"] = dict(sorted(history["days"].items()))
     HISTORY_PATH.write_text(json.dumps(history, indent=2) + "\n")
 
 
-def update_readme(avg: int, peak: int) -> None:
-    text = README_PATH.read_text()
-    replacement = (
-        f"{START_MARKER}\n"
-        f"**OpenSiro maintainer** · 10d avg **{avg} contributions/day** · peak **{peak}/day**\n"
-        f"{END_MARKER}"
-    )
-    pattern = re.compile(
-        re.escape(START_MARKER) + r".*?" + re.escape(END_MARKER),
-        flags=re.DOTALL,
-    )
-    if not pattern.search(text):
-        raise RuntimeError("Maintainer stats markers are missing from README.md")
-    README_PATH.write_text(pattern.sub(replacement, text))
+def render_card(days: list[date], values: list[int], avg: int, peak: int) -> None:
+    width, height = 900, 190
+    gx0, gx1 = 360, 850
+    gy0, gy1 = 92, 158
+    low, high = min(values), max(values)
+    spread = max(high - low, 1)
+
+    points = []
+    for i, value in enumerate(values):
+        x = gx0 + (gx1 - gx0) * i / (len(values) - 1)
+        y = gy1 - (value - low) / spread * (gy1 - gy0)
+        points.append((x, y))
+
+    points_attr = " ".join(f"{x:.1f},{y:.1f}" for x, y in points)
+    motion_path = "M " + " L ".join(f"{x:.1f},{y:.1f}" for x, y in points)
+    avg_y = gy1 - (avg - low) / spread * (gy1 - gy0)
+    dots = "".join(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="2.8"/>' for x, y in points)
+    first_label = days[0].strftime("%b %d")
+    last_label = days[-1].strftime("%b %d")
+
+    svg = f'''<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}" role="img" aria-labelledby="title desc">
+  <title id="title">OpenSiro maintainer activity</title>
+  <desc id="desc">{avg} GitHub contributions per day over the last 10 completed days, with a peak of {peak} contributions in one day.</desc>
+  <rect x="0.5" y="0.5" width="899" height="189" rx="14" fill="#ffffff" stroke="#d0d7de"/>
+  <g fill="#18181b" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,Liberation Mono,monospace">
+    <text x="30" y="34" font-size="12" font-weight="700" letter-spacing="1.4">OPENSIRO / MAINTAINER ACTIVITY</text>
+    <text x="870" y="34" text-anchor="end" font-size="10" fill="#6e7781" letter-spacing="0.8">PROFILE-WIDE GITHUB</text>
+    <text x="30" y="94" font-size="42" font-weight="700">{avg}</text>
+    <text x="30" y="118" font-size="12" fill="#57606a">contributions/day · 10d avg</text>
+    <text x="220" y="94" font-size="30" font-weight="700">{peak}</text>
+    <text x="220" y="118" font-size="12" fill="#57606a">peak / day</text>
+    <line x1="{gx0}" y1="{avg_y:.1f}" x2="{gx1}" y2="{avg_y:.1f}" stroke="#d8dee4" stroke-width="1" stroke-dasharray="4 5"/>
+    <polyline points="{points_attr}" fill="none" stroke="#18181b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    {dots}
+    <text x="{gx0}" y="177" font-size="10" fill="#6e7781">{first_label}</text>
+    <text x="{gx1}" y="177" text-anchor="end" font-size="10" fill="#6e7781">{last_label}</text>
+  </g>
+  <g aria-hidden="true">
+    <g>
+      <text x="0" y="-8" text-anchor="middle" dominant-baseline="middle" font-family="'Noto Sans JP','Hiragino Sans','Yu Gothic',sans-serif" font-size="18" font-weight="600" fill="#18181b">白</text>
+      <animateMotion dur="5s" repeatCount="indefinite" rotate="0" path="{motion_path}"/>
+    </g>
+  </g>
+</svg>
+'''
+
+    CARD_PATH.parent.mkdir(parents=True, exist_ok=True)
+    CARD_PATH.write_text(svg)
 
 
 def main() -> None:
@@ -122,16 +158,14 @@ def main() -> None:
         history["days"][day["date"]] = day["contributionCount"]
 
     rolling_start = last_complete_day - timedelta(days=WINDOW_DAYS - 1)
-    rolling = [
-        history["days"].get((rolling_start + timedelta(days=i)).isoformat(), 0)
-        for i in range(WINDOW_DAYS)
-    ]
+    rolling_days = [rolling_start + timedelta(days=i) for i in range(WINDOW_DAYS)]
+    rolling = [history["days"].get(day.isoformat(), 0) for day in rolling_days]
     avg = int(sum(rolling) / WINDOW_DAYS + 0.5)
     peak = max(rolling)
 
-    update_readme(avg, peak)
-    save_history(history)
-    print(f"10d avg: {avg}/day; peak: {peak}/day")
+    render_card(rolling_days, rolling, avg, peak)
+    save_history(history, last_complete_day, avg, peak)
+    print(f"10d avg: {avg}/day; peak: {peak}/day; card: {CARD_PATH}")
 
 
 if __name__ == "__main__":

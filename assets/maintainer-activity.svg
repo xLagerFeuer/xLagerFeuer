@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="190" viewBox="0 0 900 190" role="img" aria-labelledby="title desc">
+  <title id="title">OpenSiro maintainer activity</title>
+  <desc id="desc">272 GitHub contributions per day over the last 10 completed days, with a peak of 377 contributions in one day.</desc>
+  <rect x="0.5" y="0.5" width="899" height="189" rx="14" fill="#ffffff" stroke="#d0d7de"/>
+  <g fill="#18181b" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,Liberation Mono,monospace">
+    <text x="30" y="34" font-size="12" font-weight="700" letter-spacing="1.4">OPENSIRO / MAINTAINER ACTIVITY</text>
+    <text x="870" y="34" text-anchor="end" font-size="10" fill="#6e7781" letter-spacing="0.8">PROFILE-WIDE GITHUB</text>
+    <text x="30" y="94" font-size="42" font-weight="700">272</text>
+    <text x="30" y="118" font-size="12" fill="#57606a">contributions/day · 10d avg</text>
+    <text x="220" y="94" font-size="30" font-weight="700">377</text>
+    <text x="220" y="118" font-size="12" fill="#57606a">peak / day</text>
+    <line x1="360" y1="123.5" x2="850" y2="123.5" stroke="#d8dee4" stroke-width="1" stroke-dasharray="4 5"/>
+    <polyline points="360.0,110.9 414.4,102.2 468.9,97.7 523.3,130.7 577.8,109.7 632.2,149.0 686.7,158.0 741.1,155.3 795.6,130.7 850.0,92.0" fill="none" stroke="#18181b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="360.0" cy="110.9" r="2.8"/><circle cx="414.4" cy="102.2" r="2.8"/><circle cx="468.9" cy="97.7" r="2.8"/><circle cx="523.3" cy="130.7" r="2.8"/><circle cx="577.8" cy="109.7" r="2.8"/><circle cx="632.2" cy="149.0" r="2.8"/><circle cx="686.7" cy="158.0" r="2.8"/><circle cx="741.1" cy="155.3" r="2.8"/><circle cx="795.6" cy="130.7" r="2.8"/><circle cx="850.0" cy="92.0" r="2.8"/>
+    <text x="360" y="177" font-size="10" fill="#6e7781">Sep 20</text>
+    <text x="850" y="177" text-anchor="end" font-size="10" fill="#6e7781">Sep 29</text>
+  </g>
+  <g aria-hidden="true">
+    <g>
+      <text x="0" y="-8" text-anchor="middle" dominant-baseline="middle" font-family="'Noto Sans JP','Hiragino Sans','Yu Gothic',sans-serif" font-size="18" font-weight="600" fill="#18181b">白</text>
+      <animateMotion dur="5s" repeatCount="indefinite" rotate="0" path="M 360.0,110.9 L 414.4,102.2 L 468.9,97.7 L 523.3,130.7 L 577.8,109.7 L 632.2,149.0 L 686.7,158.0 L 741.1,155.3 L 795.6,130.7 L 850.0,92.0"/>
+    </g>
+  </g>
+</svg>
