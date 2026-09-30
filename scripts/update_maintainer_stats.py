@@ -42,26 +42,6 @@ def graphql(query: str, variables: dict) -> dict:
 
 
 def fetch_contributions(start_day: date, end_day: date) -> list[dict]:
-    query = """
-    query($user: String!, $org: String!, $from: DateTime!, $to: DateTime!) {
-      organization(login: $org) { id }
-      user(login: $user) {
-        contributionsCollection(from: $from, to: $to) {
-          contributionCalendar {
-            weeks {
-              contributionDays {
-                date
-                contributionCount
-              }
-            }
-          }
-        }
-      }
-    }
-    """
-
-    # Resolve the organization ID first because contributionsCollection accepts
-    # organizationID, not an organization login.
     org_query = """
     query($org: String!) {
       organization(login: $org) { id }
@@ -72,7 +52,7 @@ def fetch_contributions(start_day: date, end_day: date) -> list[dict]:
     if not org:
         raise RuntimeError(f"Organization not found: {ORGANIZATION}")
 
-    query = """
+    contributions_query = """
     query($user: String!, $orgId: ID!, $from: DateTime!, $to: DateTime!) {
       user(login: $user) {
         contributionsCollection(from: $from, to: $to, organizationID: $orgId) {
@@ -92,7 +72,7 @@ def fetch_contributions(start_day: date, end_day: date) -> list[dict]:
     from_dt = datetime.combine(start_day, time.min, tzinfo=timezone.utc)
     to_dt = datetime.combine(end_day, time.max, tzinfo=timezone.utc)
     data = graphql(
-        query,
+        contributions_query,
         {
             "user": USERNAME,
             "orgId": org["id"],
