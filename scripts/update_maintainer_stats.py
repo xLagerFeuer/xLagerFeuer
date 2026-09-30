@@ -183,9 +183,9 @@ def save_history(history: dict, as_of: date, avg: int, peak: int, breakdown: dic
 
 
 def render_card(days: list[date], values: list[int], avg: int, peak: int, breakdown: dict) -> None:
-    width, height = 900, 190
-    gx0, gx1 = 340, 620
-    gy0, gy1 = 92, 154
+    width, height = 900, 200
+    gx0, gx1 = 360, 850
+    gy0, gy1 = 78, 156
     low, high = min(values), max(values)
     spread = max(high - low, 1)
 
@@ -210,37 +210,31 @@ def render_card(days: list[date], values: list[int], avg: int, peak: int, breakd
     svg = f'''<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}" role="img" aria-labelledby="title desc">
   <title id="title">OpenSiro maintainer activity</title>
   <desc id="desc">{avg} GitHub contributions per day over the last 10 completed days, with a peak of {peak}. The same window includes {merged_prs} merged pull requests, {issues} opened issues, {commits} commit contributions, and activity across {repos} repositories.</desc>
-  <rect x="0.5" y="0.5" width="899" height="189" rx="14" fill="#ffffff" stroke="#d0d7de"/>
+  <rect x="0.5" y="0.5" width="899" height="199" rx="14" fill="#ffffff" stroke="#d0d7de"/>
   <g fill="#18181b" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,Liberation Mono,monospace">
     <text x="30" y="34" font-size="12" font-weight="700" letter-spacing="1.4">OPENSIRO / MAINTAINER ACTIVITY</text>
     <text x="870" y="34" text-anchor="end" font-size="10" fill="#6e7781" letter-spacing="0.8">PROFILE-WIDE GITHUB</text>
 
-    <text x="30" y="94" font-size="42" font-weight="700">{avg}</text>
-    <text x="30" y="118" font-size="12" fill="#57606a">contributions/day · 10d avg</text>
-    <text x="210" y="94" font-size="30" font-weight="700">{peak}</text>
-    <text x="210" y="118" font-size="12" fill="#57606a">peak / day</text>
+    <text x="30" y="86" font-size="42" font-weight="700">{avg}</text>
+    <text x="30" y="108" font-size="12" fill="#57606a">contributions/day · 10d avg</text>
+    <text x="210" y="86" font-size="30" font-weight="700">{peak}</text>
+    <text x="210" y="108" font-size="12" fill="#57606a">peak / day</text>
+
+    <g>
+      <text x="30" y="132" font-size="9" font-weight="700" fill="#6e7781" letter-spacing="1.1">10D ACTIVITY</text>
+
+      <text x="30" y="154" font-size="15"><tspan font-weight="700">{merged_prs}</tspan><tspan font-size="10" fill="#57606a"> PRs</tspan></text>
+      <text x="165" y="154" font-size="15"><tspan font-weight="700">{issues}</tspan><tspan font-size="10" fill="#57606a"> issues</tspan></text>
+
+      <text x="30" y="179" font-size="15"><tspan font-weight="700">{commits}</tspan><tspan font-size="10" fill="#57606a"> commits</tspan></text>
+      <text x="165" y="179" font-size="15"><tspan font-weight="700">{repos}</tspan><tspan font-size="10" fill="#57606a"> repos</tspan></text>
+    </g>
 
     <line x1="{gx0}" y1="{avg_y:.1f}" x2="{gx1}" y2="{avg_y:.1f}" stroke="#d8dee4" stroke-width="1" stroke-dasharray="4 5"/>
     <polyline points="{points_attr}" fill="none" stroke="#18181b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
     {dots}
-    <text x="{gx0}" y="177" font-size="10" fill="#6e7781">{first_label}</text>
-    <text x="{gx1}" y="177" text-anchor="end" font-size="10" fill="#6e7781">{last_label}</text>
-
-    <g>
-      <text x="660" y="70" font-size="9" font-weight="700" fill="#6e7781" letter-spacing="1.1">10D ACTIVITY</text>
-
-      <text x="660" y="100" font-size="21" font-weight="700">{merged_prs}</text>
-      <text x="660" y="115" font-size="10" fill="#57606a">PRs · merged</text>
-
-      <text x="770" y="100" font-size="21" font-weight="700">{issues}</text>
-      <text x="770" y="115" font-size="10" fill="#57606a">issues</text>
-
-      <text x="660" y="146" font-size="21" font-weight="700">{commits}</text>
-      <text x="660" y="161" font-size="10" fill="#57606a">commits</text>
-
-      <text x="770" y="146" font-size="21" font-weight="700">{repos}</text>
-      <text x="770" y="161" font-size="10" fill="#57606a">repos</text>
-    </g>
+    <text x="{gx0}" y="186" font-size="10" fill="#6e7781">{first_label}</text>
+    <text x="{gx1}" y="186" text-anchor="end" font-size="10" fill="#6e7781">{last_label}</text>
   </g>
 
   <g aria-hidden="true">
