@@ -2,6 +2,7 @@
 
 import json
 import os
+import urllib.parse
 import urllib.request
 from datetime import date, datetime, time, timedelta, timezone
 from pathlib import Path
@@ -35,6 +36,22 @@ def graphql(query: str, variables: dict) -> dict:
     if body.get("errors"):
         raise RuntimeError(json.dumps(body["errors"], indent=2))
     return body["data"]
+
+
+def public_search_count(query: str) -> int:
+    # Deliberately unauthenticated: the repository-scoped Actions token can
+    # undercount cross-repository public search results outside this repo.
+    params = urllib.parse.urlencode({"q": query, "per_page": 1})
+    request = urllib.request.Request(
+        f"https://api.github.com/search/issues?{params}",
+        headers={
+            "Accept": "application/vnd.github+json",
+            "User-Agent": "opensiro-maintainer-stats",
+        },
+    )
+    with urllib.request.urlopen(request) as response:
+        body = json.load(response)
+    return int(body["total_count"])
 
 
 def fetch_contributions(start_day: date, end_day: date) -> list[dict]:
@@ -77,13 +94,7 @@ def fetch_contributions(start_day: date, end_day: date) -> list[dict]:
 
 def fetch_window_breakdown(start_day: date, end_day: date) -> dict:
     query = """
-    query(
-      $user: String!,
-      $from: DateTime!,
-      $to: DateTime!,
-      $mergedQuery: String!,
-      $issueQuery: String!
-    ) {
+    query($user: String!, $from: DateTime!, $to: DateTime!) {
       user(login: $user) {
         contributionsCollection(from: $from, to: $to) {
           totalCommitContributions
@@ -98,26 +109,17 @@ def fetch_window_breakdown(start_day: date, end_day: date) -> dict:
           }
         }
       }
-      mergedPullRequests: search(query: $mergedQuery, type: ISSUE, first: 1) {
-        issueCount
-      }
-      openedIssues: search(query: $issueQuery, type: ISSUE, first: 1) {
-        issueCount
-      }
     }
     """
 
     from_dt = datetime.combine(start_day, time.min, tzinfo=timezone.utc)
     to_dt = datetime.combine(end_day, time.max, tzinfo=timezone.utc)
-    date_range = f"{start_day.isoformat()}..{end_day.isoformat()}"
     data = graphql(
         query,
         {
             "user": USERNAME,
             "from": from_dt.isoformat().replace("+00:00", "Z"),
             "to": to_dt.isoformat().replace("+00:00", "Z"),
-            "mergedQuery": f"author:{USERNAME} is:pr is:merged merged:{date_range}",
-            "issueQuery": f"author:{USERNAME} is:issue created:{date_range}",
         },
     )
 
@@ -138,9 +140,17 @@ def fetch_window_breakdown(start_day: date, end_day: date) -> dict:
             if name:
                 repositories.add(name)
 
+    date_range = f"{start_day.isoformat()}..{end_day.isoformat()}"
+    merged_prs = public_search_count(
+        f"author:{USERNAME} is:pr is:merged merged:{date_range}"
+    )
+    issues = public_search_count(
+        f"author:{USERNAME} is:issue created:{date_range}"
+    )
+
     return {
-        "merged_prs": data["mergedPullRequests"]["issueCount"],
-        "issues": data["openedIssues"]["issueCount"],
+        "merged_prs": merged_prs,
+        "issues": issues,
         "commits": collection["totalCommitContributions"],
         "repos": len(repositories),
     }
