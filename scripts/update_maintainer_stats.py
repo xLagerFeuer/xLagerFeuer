@@ -162,7 +162,15 @@ def load_history() -> dict:
     return json.loads(HISTORY_PATH.read_text())
 
 
-def save_history(history: dict, as_of: date, avg: int, peak: int, breakdown: dict) -> None:
+def save_history(
+    history: dict,
+    as_of: date,
+    avg: int,
+    peak: int,
+    today: date,
+    today_value: int,
+    breakdown: dict,
+) -> None:
     HISTORY_PATH.parent.mkdir(parents=True, exist_ok=True)
     history["username"] = USERNAME
     history["scope"] = "github"
@@ -172,6 +180,8 @@ def save_history(history: dict, as_of: date, avg: int, peak: int, breakdown: dic
         "as_of": as_of.isoformat(),
         "avg_10d": avg,
         "peak_10d": peak,
+        "today_date": today.isoformat(),
+        "today_contributions": today_value,
         "merged_prs_10d": breakdown["merged_prs"],
         "issues_10d": breakdown["issues"],
         "commits_10d": breakdown["commits"],
@@ -182,25 +192,43 @@ def save_history(history: dict, as_of: date, avg: int, peak: int, breakdown: dic
     HISTORY_PATH.write_text(json.dumps(history, indent=2) + "\n")
 
 
-def render_card(days: list[date], values: list[int], avg: int, peak: int, breakdown: dict) -> None:
+def render_card(
+    completed_days: list[date],
+    completed_values: list[int],
+    today: date,
+    today_value: int,
+    avg: int,
+    peak: int,
+    breakdown: dict,
+) -> None:
     width, height = 900, 200
     gx0, gx1 = 360, 850
     gy0, gy1 = 78, 156
-    low, high = min(values), max(values)
+
+    graph_days = completed_days + [today]
+    graph_values = completed_values + [today_value]
+    low, high = min(graph_values), max(graph_values)
     spread = max(high - low, 1)
 
     points = []
-    for i, value in enumerate(values):
-        x = gx0 + (gx1 - gx0) * i / (len(values) - 1)
+    for i, value in enumerate(graph_values):
+        x = gx0 + (gx1 - gx0) * i / (len(graph_values) - 1)
         y = gy1 - (value - low) / spread * (gy1 - gy0)
         points.append((x, y))
 
-    points_attr = " ".join(f"{x:.1f},{y:.1f}" for x, y in points)
+    history_points = points[:-1]
+    today_point = points[-1]
+    history_points_attr = " ".join(f"{x:.1f},{y:.1f}" for x, y in history_points)
     motion_path = "M " + " L ".join(f"{x:.1f},{y:.1f}" for x, y in points)
     avg_y = gy1 - (avg - low) / spread * (gy1 - gy0)
-    dots = "".join(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="2.8"/>' for x, y in points)
-    first_label = days[0].strftime("%b %d")
-    last_label = days[-1].strftime("%b %d")
+    dots = "".join(
+        f'<circle cx="{x:.1f}" cy="{y:.1f}" r="2.8"/>'
+        for x, y in history_points
+    )
+    first_label = graph_days[0].strftime("%b %d")
+    today_label = today.strftime("%b %d")
+    last_history_x, last_history_y = history_points[-1]
+    today_x, today_y = today_point
 
     merged_prs = breakdown["merged_prs"]
     issues = breakdown["issues"]
@@ -209,16 +237,20 @@ def render_card(days: list[date], values: list[int], avg: int, peak: int, breakd
 
     svg = f'''<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}" role="img" aria-labelledby="title desc">
   <title id="title">OpenSiro maintainer activity</title>
-  <desc id="desc">{avg} GitHub contributions per day over the last 10 completed days, with a peak of {peak}. The same window includes {merged_prs} merged pull requests, {issues} opened issues, {commits} commit contributions, and activity across {repos} repositories.</desc>
-  <rect x="0.5" y="0.5" width="899" height="199" rx="14" fill="#ffffff" stroke="#d0d7de"/>
-  <g fill="#18181b" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,Liberation Mono,monospace">
+  <desc id="desc">{avg} GitHub contributions per day over the last 10 completed days, with a peak of {peak}. Today is live at {today_value} contributions. The completed 10-day window includes {merged_prs} merged pull requests, {issues} opened issues, {commits} commit contributions, and activity across {repos} repositories.</desc>
+
+  <g id="layer-chrome">
+    <rect x="0.5" y="0.5" width="899" height="199" rx="14" fill="#ffffff" stroke="#d0d7de"/>
+  </g>
+
+  <g id="layer-summary" fill="#18181b" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,Liberation Mono,monospace">
     <text x="30" y="34" font-size="12" font-weight="700" letter-spacing="1.4">OPENSIRO / MAINTAINER ACTIVITY</text>
     <text x="870" y="34" text-anchor="end" font-size="10" fill="#6e7781" letter-spacing="0.8">PROFILE-WIDE GITHUB</text>
 
     <text x="30" y="86" font-size="42" font-weight="700">{avg}</text>
     <text x="30" y="108" font-size="12" fill="#57606a">contributions/day · 10d avg</text>
     <text x="210" y="86" font-size="30" font-weight="700">{peak}</text>
-    <text x="210" y="108" font-size="12" fill="#57606a">peak / day</text>
+    <text x="210" y="108" font-size="12" fill="#57606a">peak / completed day</text>
 
     <g>
       <text x="30" y="132" font-size="9" font-weight="700" fill="#6e7781" letter-spacing="1.1">10D ACTIVITY</text>
@@ -229,15 +261,23 @@ def render_card(days: list[date], values: list[int], avg: int, peak: int, breakd
       <text x="30" y="179" font-size="15"><tspan font-weight="700">{commits}</tspan><tspan font-size="10" fill="#57606a"> commits</tspan></text>
       <text x="165" y="179" font-size="15"><tspan font-weight="700">{repos}</tspan><tspan font-size="10" fill="#57606a"> repos</tspan></text>
     </g>
-
-    <line x1="{gx0}" y1="{avg_y:.1f}" x2="{gx1}" y2="{avg_y:.1f}" stroke="#d8dee4" stroke-width="1" stroke-dasharray="4 5"/>
-    <polyline points="{points_attr}" fill="none" stroke="#18181b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-    {dots}
-    <text x="{gx0}" y="186" font-size="10" fill="#6e7781">{first_label}</text>
-    <text x="{gx1}" y="186" text-anchor="end" font-size="10" fill="#6e7781">{last_label}</text>
   </g>
 
-  <g aria-hidden="true">
+  <g id="layer-history" fill="#18181b" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,Liberation Mono,monospace">
+    <line x1="{gx0}" y1="{avg_y:.1f}" x2="{gx1}" y2="{avg_y:.1f}" stroke="#d8dee4" stroke-width="1" stroke-dasharray="4 5"/>
+    <polyline points="{history_points_attr}" fill="none" stroke="#18181b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    {dots}
+    <text x="{gx0}" y="186" font-size="10" fill="#6e7781">{first_label}</text>
+  </g>
+
+  <g id="layer-live" fill="#18181b" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,Liberation Mono,monospace">
+    <line x1="{last_history_x:.1f}" y1="{last_history_y:.1f}" x2="{today_x:.1f}" y2="{today_y:.1f}" stroke="#18181b" stroke-width="2.2" stroke-linecap="round" stroke-dasharray="4 4"/>
+    <circle cx="{today_x:.1f}" cy="{today_y:.1f}" r="4.2" fill="#ffffff" stroke="#18181b" stroke-width="2"/>
+    <text x="{gx1}" y="58" text-anchor="end" font-size="10" font-weight="700">{today_value} TODAY · LIVE</text>
+    <text x="{gx1}" y="186" text-anchor="end" font-size="10" fill="#6e7781">{today_label} · live</text>
+  </g>
+
+  <g id="layer-mascot" aria-hidden="true">
     <g>
       <text x="0" y="-8" text-anchor="middle" dominant-baseline="middle" font-family="'Noto Sans JP','Hiragino Sans','Yu Gothic',sans-serif" font-size="18" font-weight="600" fill="#18181b">白</text>
       <animateMotion dur="5s" repeatCount="indefinite" rotate="0" path="{motion_path}"/>
@@ -251,11 +291,13 @@ def render_card(days: list[date], values: list[int], avg: int, peak: int, breakd
 
 
 def main() -> None:
-    # Exclude today because it is incomplete and would depress the rolling average.
-    last_complete_day = datetime.now(timezone.utc).date() - timedelta(days=1)
-    start_day = last_complete_day - timedelta(days=HISTORY_LOOKBACK_DAYS - 1)
+    # Keep the 10-day average stable by using only completed days, but fetch
+    # today's contribution count separately so the card can expose a live point.
+    today = datetime.now(timezone.utc).date()
+    last_complete_day = today - timedelta(days=1)
+    start_day = today - timedelta(days=HISTORY_LOOKBACK_DAYS - 1)
 
-    fetched = fetch_contributions(start_day, last_complete_day)
+    fetched = fetch_contributions(start_day, today)
     history = load_history()
     for day in fetched:
         history["days"][day["date"]] = day["contributionCount"]
@@ -263,14 +305,31 @@ def main() -> None:
     rolling_start = last_complete_day - timedelta(days=WINDOW_DAYS - 1)
     rolling_days = [rolling_start + timedelta(days=i) for i in range(WINDOW_DAYS)]
     rolling = [history["days"].get(day.isoformat(), 0) for day in rolling_days]
+    today_value = history["days"].get(today.isoformat(), 0)
     avg = int(sum(rolling) / WINDOW_DAYS + 0.5)
     peak = max(rolling)
     breakdown = fetch_window_breakdown(rolling_start, last_complete_day)
 
-    render_card(rolling_days, rolling, avg, peak, breakdown)
-    save_history(history, last_complete_day, avg, peak, breakdown)
+    render_card(
+        rolling_days,
+        rolling,
+        today,
+        today_value,
+        avg,
+        peak,
+        breakdown,
+    )
+    save_history(
+        history,
+        last_complete_day,
+        avg,
+        peak,
+        today,
+        today_value,
+        breakdown,
+    )
     print(
-        f"10d avg: {avg}/day; peak: {peak}/day; "
+        f"10d avg: {avg}/day; peak: {peak}/day; today: {today_value}; "
         f"merged PRs: {breakdown['merged_prs']}; issues: {breakdown['issues']}; "
         f"commits: {breakdown['commits']}; repos: {breakdown['repos']}; card: {CARD_PATH}"
     )
