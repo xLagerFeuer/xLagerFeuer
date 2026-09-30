@@ -8,7 +8,6 @@ from datetime import date, datetime, time, timedelta, timezone
 from pathlib import Path
 
 USERNAME = "xLagerFeuer"
-ORGANIZATION = "opensiro"
 WINDOW_DAYS = 10
 HISTORY_LOOKBACK_DAYS = 90
 README_PATH = Path("README.md")
@@ -42,20 +41,10 @@ def graphql(query: str, variables: dict) -> dict:
 
 
 def fetch_contributions(start_day: date, end_day: date) -> list[dict]:
-    org_query = """
-    query($org: String!) {
-      organization(login: $org) { id }
-    }
-    """
-    org_data = graphql(org_query, {"org": ORGANIZATION})
-    org = org_data.get("organization")
-    if not org:
-        raise RuntimeError(f"Organization not found: {ORGANIZATION}")
-
-    contributions_query = """
-    query($user: String!, $orgId: ID!, $from: DateTime!, $to: DateTime!) {
+    query = """
+    query($user: String!, $from: DateTime!, $to: DateTime!) {
       user(login: $user) {
-        contributionsCollection(from: $from, to: $to, organizationID: $orgId) {
+        contributionsCollection(from: $from, to: $to) {
           contributionCalendar {
             weeks {
               contributionDays {
@@ -72,10 +61,9 @@ def fetch_contributions(start_day: date, end_day: date) -> list[dict]:
     from_dt = datetime.combine(start_day, time.min, tzinfo=timezone.utc)
     to_dt = datetime.combine(end_day, time.max, tzinfo=timezone.utc)
     data = graphql(
-        contributions_query,
+        query,
         {
             "user": USERNAME,
-            "orgId": org["id"],
             "from": from_dt.isoformat().replace("+00:00", "Z"),
             "to": to_dt.isoformat().replace("+00:00", "Z"),
         },
@@ -92,17 +80,16 @@ def fetch_contributions(start_day: date, end_day: date) -> list[dict]:
 
 def load_history() -> dict:
     if not HISTORY_PATH.exists():
-        return {
-            "username": USERNAME,
-            "organization": ORGANIZATION,
-            "window_days": WINDOW_DAYS,
-            "days": {},
-        }
+        return {"username": USERNAME, "scope": "github", "window_days": WINDOW_DAYS, "days": {}}
     return json.loads(HISTORY_PATH.read_text())
 
 
 def save_history(history: dict) -> None:
     HISTORY_PATH.parent.mkdir(parents=True, exist_ok=True)
+    history["username"] = USERNAME
+    history["scope"] = "github"
+    history.pop("organization", None)
+    history["window_days"] = WINDOW_DAYS
     history["updated_at"] = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
     history["days"] = dict(sorted(history["days"].items()))
     HISTORY_PATH.write_text(json.dumps(history, indent=2) + "\n")
